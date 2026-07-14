@@ -69,10 +69,21 @@ jobs:
         run: sleep 30
 
       # 2. Install dependencies
-      - name: Install Ruby + Bundler
+      - name: Install Ruby + Bundler + Build Tools
         run: |
           echo "=== Installing Ruby Dependencies ==="
           ruby --version
+
+          # Install build essentials for native gems
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libssl-dev \
+            libreadline-dev \
+            zlib1g-dev \
+            ruby-dev
+
+          # Install bundler
           sudo gem install bundler
           bundler --version
 
@@ -192,7 +203,21 @@ jobs:
             exit 1
           fi
 
-          bundle install
+          # Show Gemfile
+          echo "=== Gemfile ==="
+          cat Gemfile
+
+          # Install gems (with retry on failure)
+          echo "=== Running bundle install ==="
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs=4 --retry=3 || {
+            echo "Bundle install failed, showing detailed error:"
+            bundle install --verbose
+            exit 1
+          }
+
+          echo "=== Bundle install successful ==="
+          bundle list
 
       # 4. Setup CPI Test Environment Variables
       - name: Setup CPI Test Environment Variables
