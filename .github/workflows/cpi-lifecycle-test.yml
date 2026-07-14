@@ -180,9 +180,18 @@ jobs:
 
       # 4. Install CPI dependencies
       - name: Install CPI Ruby Dependencies
+        working-directory: src/bosh_openstack_cpi
         run: |
           echo "=== Installing CPI Dependencies ==="
-          cd src/bosh_openstack_cpi
+          echo "Current directory: $(pwd)"
+          ls -la
+
+          # Check if Gemfile exists
+          if [ ! -f Gemfile ]; then
+            echo "ERROR: Gemfile not found!"
+            exit 1
+          fi
+
           bundle install
 
       # 4. Setup CPI Test Environment Variables
@@ -314,10 +323,10 @@ EOF
       - name: Run CPI Lifecycle Tests
         id: cpi_tests
         continue-on-error: true
+        working-directory: src/bosh_openstack_cpi
         run: |
           echo "=== Running CPI Lifecycle Tests ==="
-
-          cd src/bosh_openstack_cpi
+          echo "Current directory: $(pwd)"
 
           # Ensure stemcell path is set
           if [ -z "$BOSH_OPENSTACK_STEMCELL_PATH" ]; then
