@@ -3,7 +3,7 @@ name: CPI Lifecycle Tests
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ '**' ]  # Läuft auf ALLEN Branches
     paths:
       - 'src/bosh_openstack_cpi/**'
       - '.github/workflows/cpi-lifecycle-test.yml'
